@@ -1,0 +1,45 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <ul class="pages">
+            <li class="chat page">
+                <div class="chatArea">
+                    <ul class="messages">
+                        <template v-for="message in messages" track-by="$index">
+                         <li>
+                            <span class="username" >{{message.user}}</span><span>{{message.msg}}</span>
+                        </li>
+                        <li class="log">
+                            <span>{{message.log}}</span>
+                        </li>
+                        </template>
+                        <li :transitioin="fade">
+                            <span class="username">{{typingMsg.user}}</span><span class="typing">{{typingMsg.msg}}</span>
+                        </li>
+                    </ul>
+                </div>
+                <input class="inputMessage" v-model='inputMessage' @keyup.enter='pushMessage' placeholder="Type here..." />
+            </li>
+            <li class="login page">
+                <div class="form">
+                    <h3 class="title">Talk is cheap, show me your vanity.'</h3>
+                    <input class="usernameInput" type="text" maxlength="14" @keyup.enter="setName" v-model="userName">
+                </div>
+            </li>
+        </ul>
+
+    </div>
+</body>
+<script src="./vue.js"></script>
+<script src="./socket.io.js"></script>
+<script src="./jquery.min.js"></script>
+<script src="./main.js"></script>
+
+</html>
