@@ -14,13 +14,13 @@
                     <ul class="messages">
                         <template v-for="message in messages" track-by="$index">
                          <li>
-                            <span class="username" >{{message.user}}</span><span>{{message.msg}}</span>
+                            <span v-if="message.user != undefined" class="username" >{{message.user}}</span><span>{{message.msg}}</span>
                         </li>
-                        <li class="log">
+                        <li v-if="message.log!= undefined " class="log">
                             <span>{{message.log}}</span>
                         </li>
                         </template>
-                        <li :transitioin="fade">
+                        <li>
                             <span class="username">{{typingMsg.user}}</span><span class="typing">{{typingMsg.msg}}</span>
                         </li>
                     </ul>

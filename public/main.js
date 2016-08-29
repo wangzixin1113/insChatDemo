@@ -1,5 +1,5 @@
 var FADE_TIME = 150 // ms
-var TYPING_TIMER_LENGTH = 400 // ms
+var TYPING_TIMER_LENGTH = 500 // ms
 var PRINT_CHAT_TIME = 2 * 60 * 1000 //ms
 var COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
@@ -31,7 +31,7 @@ new Vue({
         userName: '',
         userList: [],
         inputMessage: '',
-        typingMsg: ''
+        typingMsg: {}
     },
     methods: {
         initSocketIO: function() {
@@ -46,14 +46,13 @@ new Vue({
             var Vue = this
 
             socket = io.connect()
-            setInterval(function() {
-                if (isTyping && Date.now() - latestTypingTime > TYPING_TIMER_LENGTH) {
-                    socket.emit('stop typing', {})
-                    isTyping = false
-                }
-                console.log($messages.scrollTop())
-
-            }, FADE_TIME)
+                // setInterval(function() {
+                //     if (isTyping && Date.now() - latestTypingTime > TYPING_TIMER_LENGTH) {
+                //         socket.emit('stop typing', {})
+                //         isTyping = false
+                //     }
+                //     console.log($messages.scrollTop())
+                // }, TYPING_TIMER_LENGTH)
             socket.on('connect', function() {
                 console.log('server connected.')
                     // socket.on('add user', function(user) {})
@@ -68,7 +67,6 @@ new Vue({
                     if (Date.now() - latestChatTime > PRINT_CHAT_TIME)
                         Vue.logMsg(Date.now())
                     latestChatTime = Date.now()
-                    $messages[0].scrollTop = $messages[0].scrollHeight
                 })
                 socket.on('typing', function(data) {
                     Vue.addChatTyping(data)
@@ -100,6 +98,7 @@ new Vue({
             }
         },
         pushMessage: function() {
+            isTyping
             socket.emit('stop typing', {})
             socket.emit('chat', { user: this.userName, msg: this.inputMessage })
             this.inputMessage = ''
@@ -113,8 +112,12 @@ new Vue({
         logMsg: function(msg) {
             this.messages.push({ log: msg })
         },
-        getUserNameColor: function() {
-
+        getUserNameColor: function(username) {
+            var hash = 0
+            for (var i = 0; i < username.length; i++) {
+                hash += username.charCodeAt(i)
+            }
+            return COLORS[hash % COLORS.length]
         },
         addChatTyping: function(data) {
             this.typingMsg = data
@@ -129,30 +132,45 @@ new Vue({
         'inputMessage': function(val, oldVal) {
             // if (isLogined && isTyping)
             //     socket.emit('typing', { user: this.userName, msg: val })
-            if (isLogined && !isTyping) {
+
+            latestTypingTime = Date.now()
+
+            if (isLogined && !isTyping && val != '') {
                 socket.emit('typing', { user: this.userName, msg: '正在输入..' })
                 isTyping = true
-                latestTypingTime = Date.now()
-                    // setTimeout(function() {
-                    //     socket.emit('stop typing', {})
-                    //     isTyping = false
-                    // }, TYPING_TIMER_LENGTH)
-            } else {
-                latestTypingTime = Date.now()
             }
+            setTimeout(function() {
+                var time = Date.now()
+                if (time - latestTypingTime >= TYPING_TIMER_LENGTH - 5) {
+                    socket.emit('stop typing', {})
+                    isTyping = false
+                }
+            }, TYPING_TIMER_LENGTH)
         },
-        'messages': function() {
-
+        'messages': function(val, oldVal) {
+            var Vue = this
+            $messages[0].scrollTop = $messages[0].scrollHeight
+            $messages.find('.username').each(function() {
+                this.style.color = Vue.getUserNameColor(this.innerHTML)
+                    // if (this.innerHTML == '')
+                    //     this.style.display = 'none'
+            })
+        },
+        'typingMsg': function() {
+            var Vue = this
+            var typingUsr = $messages.find('.username:last')
+            typingUsr[0].style.display = 'true'
+            typingUsr[0].style.color = Vue.getUserNameColor(typingUsr[0].innerHTML)
         }
     },
     transitions: {
-        'fadeIN': {
-            css: false,
-            enter: function(el, done) {
-                $(el)
-                    .css('opacity', 0)
-                    .animate({ opacity: 1 }, 10000, done)
-            }
-        }
+        //     'fadeIN': {
+        //         css: false,
+        //         enter: function(el, done) {
+        //             $(el)
+        //                 .css('opacity', 0)
+        //                 .animate({ opacity: 1 }, 10000, done)
+        //         }
+        // }
     }
 })
