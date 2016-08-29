@@ -16,7 +16,7 @@ server.listen(8765)
     })
     //socket.io server
 var sioServer = socketio.listen(server)
-
+console.log('insChat listning on port 8765')
 var users = []
 var numUsers = 0
 var addedUser = false
