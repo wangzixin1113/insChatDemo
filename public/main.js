@@ -7,22 +7,19 @@ var COLORS = [
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
 ]
 
-var $window = $(window);
-var $usernameInput = $('.usernameInput'); // Input for username
+// var $window = $(window);
 var $messages = $('.messages'); // Messages area
 var $inputMessage = $('.inputMessage'); // Input message input box
 
 var $loginPage = $('.login.page'); // The login page
 var $chatPage = $('.chat.page'); // The chatroom page
 var $title = $('.title') //The login page tile
-var $currentInput = $usernameInput.focus();
 
 var socket
 var isLogined = false
 var latestChatTime = Date.now()
 var isTyping = false
 var latestTypingTime = Date.now()
-var messagesOffset = 1000
 console.log($('#app'))
 new Vue({
     el: '#app',
