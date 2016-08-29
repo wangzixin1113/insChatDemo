@@ -35,27 +35,11 @@ new Vue({
     },
     methods: {
         initSocketIO: function() {
-            //get references of Vue's property
-            // var messages = this.messages
-            // var userList = this.userList
-            // var setUserList = this.setUserList
-            // var userName = this.userName
-            // var logMsg = this.logMsg
-            // var addChatTyping = this.addChatTyping
-            // var removeChatTyping = this.removeChatTyping
             var Vue = this
 
             socket = io.connect()
-                // setInterval(function() {
-                //     if (isTyping && Date.now() - latestTypingTime > TYPING_TIMER_LENGTH) {
-                //         socket.emit('stop typing', {})
-                //         isTyping = false
-                //     }
-                //     console.log($messages.scrollTop())
-                // }, TYPING_TIMER_LENGTH)
             socket.on('connect', function() {
                 console.log('server connected.')
-                    // socket.on('add user', function(user) {})
                 socket.on('sync user list', function(userList) {
                     Vue.setUserList(userList)
                 })
@@ -86,7 +70,6 @@ new Vue({
         },
         setName: function() {
             this.initSocketIO()
-                //enter chat room
             if (this.userName) {
                 socket.emit('enter chat room', this.userName)
                 this.logMsg('欢迎' + this.userName + '来到聊天室')
@@ -130,9 +113,6 @@ new Vue({
     },
     watch: {
         'inputMessage': function(val, oldVal) {
-            // if (isLogined && isTyping)
-            //     socket.emit('typing', { user: this.userName, msg: val })
-
             latestTypingTime = Date.now()
 
             if (isLogined && !isTyping && val != '') {
@@ -152,8 +132,6 @@ new Vue({
             $messages[0].scrollTop = $messages[0].scrollHeight
             $messages.find('.username').each(function() {
                 this.style.color = Vue.getUserNameColor(this.innerHTML)
-                    // if (this.innerHTML == '')
-                    //     this.style.display = 'none'
             })
         },
         'typingMsg': function() {
