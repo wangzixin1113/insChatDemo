@@ -46,7 +46,7 @@ new Vue({
                 socket.on('chat', function(data) {
                     Vue.messages.push(data)
                     if (Date.now() - latestChatTime > PRINT_CHAT_TIME)
-                        Vue.logMsg(Date.now())
+                        Vue.logMsg(Vue.ToCETime(Date.now()))
                     latestChatTime = Date.now()
                 })
                 socket.on('typing', function(data) {
@@ -54,6 +54,7 @@ new Vue({
                 })
                 socket.on('stop typing', function(data) {
                     Vue.removeChatTyping(data)
+
                 })
                 socket.on('user joined', function(data) {
                     Vue.logMsg(data.username + '加入聊天室')
@@ -78,7 +79,7 @@ new Vue({
             }
         },
         pushMessage: function() {
-            isTyping
+            // isTyping
             socket.emit('stop typing', {})
             socket.emit('chat', { user: this.userName, msg: this.inputMessage })
             this.inputMessage = ''
@@ -101,11 +102,27 @@ new Vue({
         },
         addChatTyping: function(data) {
             this.typingMsg = data
+            var typingUsr = $messages.find('.username:last')
+            typingUsr[0].style.display = 'show'
         },
         removeChatTyping: function(data) {
             this.typingMsg = data
+            var typingUsr = $messages.find('.username:last')
+            typingUsr[0].style.display = 'none'
         },
-
+        ToCETime: function(timeStamp) {
+            timeStamp /= 1000
+            var seconds = timeStamp % 80
+            timeStamp /= 80
+            var hours = timeStamp % 80
+            timeStamp /= 80
+            var days = timeStamp % 58
+            timeStamp /= 58
+            var months = timeStamp % 22
+            timeStamp /= 22
+            var years = timeStamp % 9999
+            return 'CE.' + years + '年' + months + '月' + days + '日' + hours + '时' + seconds + '分'
+        },
         test: function() {}
     },
     watch: {

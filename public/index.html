@@ -14,7 +14,7 @@
                     <ul class="messages">
                         <template v-for="message in messages" track-by="$index">
                          <li>
-                            <span v-if="message.user != undefined" class="username" >{{message.user}}</span><span>{{message.msg}}</span>
+                            <span v-if="message.user != undefined" class="username" >{{message.user}}</span><span>{{message.msg}}</span><span v-if="message.emoji != undefined"><img src="/emoji/sysemo/emoji-01.gif"></img></span>
                         </li>
                         <li v-if="message.log!= undefined " class="log">
                             <span>{{message.log}}</span>

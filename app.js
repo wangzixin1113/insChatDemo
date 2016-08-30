@@ -1,22 +1,46 @@
 var http = require('http')
 var express = require('express')
 var socketio = require('socket.io')
+var fs = require('fs')
+var url = require('url')
 
 var app = express()
 var server = http.createServer(app)
-    //express
+
+var dirSysemo = '/emoji/sysemo'
+
 app.use(express.static(__dirname + '/public'))
-    .get('/', function(req, res) {
-        // res.sendFile(__dirname + '/public/index.html')
+app.get('/', function(req, res) {
+        // var request = url.parse(req.url, true);
+        // var action = request.pathname;
+        // // res.writeHead(200, { 'Content-Type': 'image/gif' })
+        // res.end()
+        // console.log(action)
+        // console.log('in /')
     })
-    //http server
-server.listen(8765)
-    .on('error', function(err) {
-        console.log(err)
+    .get(dirSysemo, function(req, res) {
+        var request = url.parse(req.url, true);
+        var filename = request.pathname
+        fs.readFile(filename, function(err, gif) {
+            res.writeHead(200, { 'Content-Type': 'image/gif' })
+            res.end(gif)
+        })
+        console.log(filename)
     })
-    //socket.io server
+
+server.listen(3000).on('error', function(err) { console.log(err) })
+
+console.log(__filename)
+console.log(__dirname)
+console.log(__dirname + '/public')
+console.log('/public')
+
+var sysemoUrls = fs.readdir(dirSysemo, function() {
+
+})
+
+//socket.io server
 var sioServer = socketio.listen(server)
-console.log('insChat listning on port 8765')
 var users = []
 var numUsers = 0
 var addedUser = false
@@ -32,11 +56,11 @@ sioServer.on('connection', function(socket) {
         socket.user = { name: name }
         users.push(name)
         numUsers++
-        // socket.emit('add user', name)
         sioServer.emit('user joined', { username: name, numUsers: numUsers })
         sioServer.emit('sync user list', users)
     })
     socket.on('chat', function(data) {
+        data.emoji = true
         sioServer.emit('chat', data)
     })
     socket.on('typing', function(data) {
